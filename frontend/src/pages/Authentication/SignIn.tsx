@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import { Link } from 'react-router-dom';
 import LogoDark from '../../images/logo/logo-dark.png';
 import Logo from '../../images/logo/logo.png';
@@ -40,26 +42,20 @@ const SignIn = () => {
     setResults({ user: null, token: null, error: null });
     setStage('ready');
   };
-  const handleSubmit = async (e: React.FormEvent & FormTypes) => {
-    e.preventDefault();
-    setStage('loading');
-    const { user, token, error } = await User.login(
-      e.target.email.value,
-      e.target.password.value
-    );
-    if (!token || !user) setStage('failed');
-    if (!!token && !!user) setStage('success');
-    setResults({ user, token, error });
-
-    if (!!token && !!user) {
-      window.localStorage.setItem(STORE_USER, JSON.stringify(user));
-      window.localStorage.setItem(STORE_TOKEN, token);
-      window.location.replace(
-        user.role === 'root' ? paths.systemSetup() : paths.dashboard()
-      );
-    }
-  };
-
+  
+  const handleSubmit = (e: React.FormEvent & FormTypes) => {
+  e.preventDefault();
+  const email = e.target.email.value;
+  const password = e.target.password.value;
+  
+  // Match the email and password with values from environment variables
+  if (email === process.env.REACT_APP_EMAIL && password === process.env.REACT_APP_PASSWORD) {
+    setStage('success');
+  } else {
+    setStage('failed');
+  }
+};
+  
   useEffect(() => {
     async function checkAuth() {
       const currentToken = window.localStorage.getItem(STORE_TOKEN);
